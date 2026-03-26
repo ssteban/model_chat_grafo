@@ -54,3 +54,4 @@ urllib3==2.6.3
 whisper==1.1.10
 uvicorn
 gunicorn
+fastapi
