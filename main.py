@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
 import logging
 from service.connect_model import get_groq_response
 from models.models import data_chat
@@ -12,6 +13,14 @@ app = FastAPI(
     title="Chat Model API",
     description="API for the Chat Model service providing recommendations.",
     version="1.0.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 @app.head("/", status_code=status.HTTP_200_OK, summary="Health Check (HEAD)")
