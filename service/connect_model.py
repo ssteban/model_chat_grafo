@@ -25,7 +25,7 @@ def get_groq_response(prompt):
                     "content": prompt,
                 }
             ],
-            model="llama-3.3-70b-versatile",
+            model="qwen/qwen3.8-27b",
         )
         return chat_completion.choices[0].message.content
     except Exception as e:
