@@ -1,9 +1,10 @@
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 import logging
-from service.connect_model import get_groq_response
-from models.models import data_chat
+from service.connect_model import get_groq_response, get_groq_response_chat
+from models.models import data_chat, data_chat_general
 from prompt.prueba_1 import prompt_inicio
+from prompt.chat_general import prompt_general
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -68,6 +69,45 @@ async def chat(data: data_chat):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error processing the recommendation request."
+        )
+
+
+@app.post("/chat_general")
+async def chat_general(data: data_chat_general):
+    """
+    Endpoint de pregunta-respuesta general (asistente NeuroIA).
+    Sin memoria: cada request se responde de forma independiente,
+    solo se envía la pregunta actual.
+    """
+    pregunta = data.pregunta.strip()
+    if not pregunta:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="La pregunta no puede estar vacía."
+        )
+
+    try:
+        logger.info(f"General chat request received ({len(pregunta)} chars)")
+
+        ai_response = get_groq_response_chat(prompt_general, pregunta)
+
+        if not ai_response:
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail="No se pudo obtener respuesta del modelo."
+            )
+
+        return {
+            "response": ai_response,
+            "status": "success"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error processing general chat request: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error processing the general chat request."
         )
 
 

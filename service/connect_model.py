@@ -32,3 +32,36 @@ def get_groq_response(prompt):
         print(f"Ocurrió un error al conectar con Groq: {e}")
         return None
 
+
+def get_groq_response_chat(system_prompt, user_message):
+    """
+    Función para preguntas generales: usa el prompt del asistente como system
+    y la pregunta del usuario como user. Sin historial (sin memoria).
+    """
+    api_key = os.getenv("GROQ_API_KEY")
+
+    if not api_key:
+        print("Error: Por favor, configura tu GROQ_API_KEY en el archivo .env")
+        return None
+
+    client = Groq(api_key=api_key)
+
+    try:
+        chat_completion = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "system",
+                    "content": system_prompt,
+                },
+                {
+                    "role": "user",
+                    "content": user_message,
+                },
+            ],
+            model="qwen/qwen3.8-27b",
+        )
+        return chat_completion.choices[0].message.content
+    except Exception as e:
+        print(f"Ocurrió un error al conectar con Groq: {e}")
+        return None
+
