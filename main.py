@@ -2,9 +2,10 @@ from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 from service.connect_model import get_groq_response, get_groq_response_chat
-from models.models import data_chat, data_chat_general
+from models.models import data_chat, data_chat_general, data_resumen_caso
 from prompt.prueba_1 import prompt_inicio
 from prompt.chat_general import prompt_general
+from prompt.resumen_caso import prompt_resumen_caso
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -108,6 +109,49 @@ async def chat_general(data: data_chat_general):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error processing the general chat request."
+        )
+
+
+@app.post("/resumen_caso")
+async def resumen_caso(data: data_resumen_caso):
+    """
+    Endpoint que genera un resumen del caso (para el módulo de seguimientos
+    del psicólogo) a partir de los datos de una prueba: quién es el estudiante,
+    qué prueba se le aplicó y qué resultado dio el modelo. Sin diagnóstico.
+    """
+    try:
+        logger.info(f"Resumen de caso solicitado para: {data.nombre_prueba}")
+
+        full_prompt = (
+            f"{prompt_resumen_caso}\n"
+            f"Datos del caso:\n"
+            f"- Estudiante: {data.nombre_estudiante}\n"
+            f"- Edad: {data.edad} años\n"
+            f"- Género: {data.genero}\n"
+            f"- Prueba aplicada: {data.nombre_prueba}\n"
+            f"- Resultado del modelo: {data.resultado_modelo}\n"
+            f"- Probabilidad estimada: {data.probabilidad}\n"
+        )
+
+        ai_response = get_groq_response(full_prompt)
+
+        if not ai_response:
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail="No se pudo obtener respuesta del modelo."
+            )
+
+        return {
+            "response": ai_response,
+            "status": "success"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error generando resumen de caso: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error generating the case summary."
         )
 
 
