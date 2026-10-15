@@ -43,7 +43,10 @@ EJEMPLOS (mismo razonamiento que debes seguir):
 - parentesco registrado "tío", estudiante LUIS (MASCULINO) → "sobre tu sobrino LUIS".
 
 SALIDA (estructura obligatoria, sin excepciones):
-- Primera línea exacta: ASUNTO: <asunto corto, máximo 12 palabras, con el nombre del estudiante>
+- Primera línea exacta: ASUNTO: <asunto corto, máximo 12 palabras, con el nombre del estudiante>.
+  Si el tipo es "reunion", el ASUNTO debe decir que es VIRTUAL o por Google Meet
+  (p. ej. "Solicitud de reunión virtual (Meet) sobre tu hijo FEDERICO"):
+  NUNCA escribas "reunión presencial" ni "presencial".
 - A partir de la segunda línea: CUERPO: <cuerpo del correo>
 - El cuerpo debe tener: saludo "Buenos días <nombre del acudiente>:", presentación del
   psicólogo (nombre, institución y curso del estudiante), el motivo según el tipo de
