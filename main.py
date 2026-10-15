@@ -2,10 +2,11 @@ from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 from service.connect_model import get_groq_response, get_groq_response_chat
-from models.models import data_chat, data_chat_general, data_resumen_caso
+from models.models import data_chat, data_chat_general, data_resumen_caso, data_redactar_correo
 from prompt.prueba_1 import prompt_inicio
 from prompt.chat_general import prompt_general
 from prompt.resumen_caso import prompt_resumen_caso
+from prompt.redactar_correo import prompt_redactar_correo
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -152,6 +153,60 @@ async def resumen_caso(data: data_resumen_caso):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error generating the case summary."
+        )
+
+
+@app.post("/redactar_correo")
+async def redactar_correo(data: data_redactar_correo):
+    """
+    Endpoint que redacta (con IA) un correo del psicólogo a un acudiente:
+    contacto general o solicitud de reunión por Meet. El front envía el
+    parentesco REGISTRADO (p. ej. "padres") y la IA lo traduce al vínculo
+    correcto del estudiante ("su hijo/hija") sin condicionales en el código.
+    Respuesta estricta: primera línea "ASUNTO: ..." y el resto "CUERPO: ...".
+    """
+    tipo = data.tipo.strip().lower()
+    if tipo not in ("contacto", "reunion"):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="El tipo debe ser 'contacto' o 'reunion'."
+        )
+
+    try:
+        logger.info(f"Redaccion de correo solicitada ({tipo}) para: {data.nombre_estudiante}")
+
+        full_prompt = (
+            f"{prompt_redactar_correo}\n"
+            f"Datos del correo:\n"
+            f"- Tipo de correo: {tipo}\n"
+            f"- Nombre del acudiente: {data.nombre_acudiente}\n"
+            f"- Parentesco registrado en el sistema: {data.parentesco_registrado or 'no informado'}\n"
+            f"- Estudiante: {data.nombre_estudiante}\n"
+            f"- Género del estudiante: {data.genero_estudiante or 'no informado'}\n"
+            f"- Curso: {data.nombre_curso or 'no informado'}\n"
+            f"- Institución: {data.nombre_colegio or 'no informado'}\n"
+            f"- Psicólogo: {data.nombre_psicologo}\n"
+        )
+
+        ai_response = get_groq_response(full_prompt)
+
+        if not ai_response:
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail="No se pudo obtener respuesta del modelo."
+            )
+
+        return {
+            "response": ai_response,
+            "status": "success"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error redactando el correo: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error drafting the email."
         )
 
 
