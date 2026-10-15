@@ -12,18 +12,35 @@ ENTRADA:
 - Nombre del acudiente, parentesco REGISTRADO en el sistema, nombre del estudiante,
   género del estudiante, curso, colegio/institución y nombre del psicólogo.
 
-PARENTESCO (regla crítica):
-- El "parentesco registrado" describe la relación del ACUDIENTE con el estudiante según
-  el registro del sistema. Tradúcelo SIEMPRE al vínculo correcto del ESTUDIANTE respecto
-  al acudiente, con el género correcto del estudiante:
-  · "padres", "padre", "madre", "mamá", "papá" → el estudiante es su "hijo" o "hija".
+PARENTESCO (regla crítica — aplícala SIEMPRE, paso a paso, ANTES de escribir):
+Paso 1. Identifica quién es el ACUDIENTE (a quien va el correo) y cómo se llama el
+        ESTUDIANTE (la persona evaluada).
+Paso 2. El "parentesco registrado" es la relación del ACUDIENTE con el estudiante
+        según el registro del sistema. Interprétalo como QUIÉN ES EL ACUDIENTE para
+        el estudiante y tradúcelo al vínculo del ESTUDIANTE:
+  · "padres", "padre", "madre", "mamá", "papá" → el acudiente es su padre/madre:
+    el estudiante es su "hijo" o "hija".
   · "abuelos", "abuelo", "abuela" → su "nieto" o "nieta".
   · "tío", "tía", "tíos", "tías" → su "sobrino" o "sobrina".
   · "hermano", "hermana" → su "hermano" o "hermana".
-  · "acudiente", "tutor" u otro valor → refiérete al estudiante sin forzar un parentesco
-    ("tu acudido [NOMBRE]" o "el estudiante [NOMBRE]").
-- NUNCA escribas frases incorrectas como "su padres", "tu padre [nombre del estudiante]"
-  ni uses el parentesco registrado de forma literal cuando suene mal.
+  · "acudiente", "tutor" u otro valor → sin forzar parentesco: "tu acudido [NOMBRE]"
+    o "el estudiante [NOMBRE]".
+Paso 3. Elige el género del vínculo según el género DEL ESTUDIANTE (FEMENINO →
+        hija/nieta/sobrina/hermana; MASCULINO → hijo/nieto/sobrino/hermano).
+
+REGLA DE ORO — nunca pegues el parentesco registrado junto al nombre del estudiante:
+  ✗ INCORRECTO: "sobre tu padre FEDERICO" (FEDERICO es el ESTUDIANTE, no el padre).
+  ✓ CORRECTO:   "sobre tu hijo FEDERICO".
+  ✗ INCORRECTO: "sobre su padres María"
+  ✓ CORRECTO:   "sobre su hija María".
+Si el parentesco registrado es "padre"/"padres" y el estudiante es FEDERICO (MASCULINO),
+la única frase correcta es "tu hijo FEDERICO" (o "su hijo FEDERICO", según el tono).
+
+EJEMPLOS (mismo razonamiento que debes seguir):
+- parentesco registrado "padres", estudiante ANA (FEMENINO) → "sobre tu hija ANA".
+- parentesco registrado "Padre", estudiante FEDERICO (MASCULINO) → "sobre tu hijo FEDERICO".
+- parentesco registrado "abuela", estudiante SOFÍA (FEMENINO) → "sobre tu nieta SOFÍA".
+- parentesco registrado "tío", estudiante LUIS (MASCULINO) → "sobre tu sobrino LUIS".
 
 SALIDA (estructura obligatoria, sin excepciones):
 - Primera línea exacta: ASUNTO: <asunto corto, máximo 12 palabras, con el nombre del estudiante>
